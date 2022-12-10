@@ -47,10 +47,11 @@ def parts_recognize():
     
     cv2.imwrite(OUTPUT_IMG_PATH, img_gray)
 
-def face_reco(img_gray):
-    XML_PATH_FACE = "/usr/local/lib/python3.7/site-packages/cv2/data/haarcascade_frontalface_default.xml"
+def face_reco(img_gray, classifier):
+    # XML_PATH_FACE = "/usr/local/lib/python3.7/site-packages/cv2/data/haarcascade_frontalface_default.xml"
 
-    classifier = cv2.CascadeClassifier(XML_PATH_FACE)
+    # classifier = cv2.CascadeClassifier(XML_PATH_FACE)
+    # del XML_PATH_FACE
     targets = classifier.detectMultiScale(img_gray)
     
 parts_recognize()

@@ -4,4 +4,4 @@
 # memo
 
 - docker build . -t font-convert
-- docker run -it font-convert bash
+- docker run --rm -it -v $(pwd)/:/var/www/html font-convert

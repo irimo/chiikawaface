@@ -9,9 +9,9 @@ import cv2
 
 class compressor:
     xml_face = "/usr/local/lib/python3.7/site-packages/cv2/data/haarcascade_frontalface_default.xml"
+    xml_lefteye = "/usr/local/lib/python3.7/site-packages/cv2/data/haarcascade_lefteye_2splits.xml"
     def parts_recognize(self):
         print("parts_recognize() start")
-        xml_lefteye = "/usr/local/lib/python3.7/site-packages/cv2/data/haarcascade_lefteye_2splits.xml"
         xml_righteye = "/usr/local/lib/python3.7/site-packages/cv2/data/haarcascade_righteye_2splits.xml"
 
         law_path = "./images/lenna.png"

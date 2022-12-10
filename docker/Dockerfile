@@ -1,4 +1,4 @@
-FROM nvidia/cuda:10.1-cudnn7-devel-ubuntu16.04
+FROM nvidia/cuda:11.8.0-base-ubuntu22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -13,7 +13,8 @@ RUN apt-get update && apt-get -y upgrade &&\
 
 # install python3.7.3
 RUN apt-get update && apt-get install -y zlib1g-dev libssl-dev libffi-dev build-essential \
-    checkinstall libreadline-gplv2-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev \
+    # checkinstall libreadline-gplv2-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev \
+    checkinstall libncursesw5-dev libssl-dev libsqlite3-dev tk-dev \
     libgdbm-dev libc6-dev libbz2-dev &&\
     rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
@@ -97,19 +98,26 @@ RUN apt-get update && apt-get upgrade -y &&\
 # RUN pip3 install -U pip
 # RUN pip3 install -U setuptools
 
-RUN cd /opt/
+WORKDIR /workspace/
     # Download and unzip OpenCV and opencv_contrib and delte zip files
-RUN    wget https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip
-RUN    unzip ${OPENCV_VERSION}.zip
-RUN    rm ${OPENCV_VERSION}.zip
-RUN    wget https://github.com/opencv/opencv_contrib/archive/${OPENCV_VERSION}.zip
-RUN   unzip ${OPENCV_VERSION}.zip
-RUN    rm ${OPENCV_VERSION}.zip
+RUN wget -c https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.tar.gz &&\
+    tar -zxvf ${OPENCV_VERSION}.tar.gz && rm ${OPENCV_VERSION}.tar.gz
+RUN wget -c https://github.com/opencv/opencv_contrib/archive/${OPENCV_VERSION}.tar.gz &&\
+    tar -zxvf ${OPENCV_VERSION}.tar.gz && rm ${OPENCV_VERSION}.tar.gz
+
+# RUN    wget https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip
+# RUN    unzip ${OPENCV_VERSION}.zip
+# RUN    rm ${OPENCV_VERSION}.zip
+# RUN    wget https://github.com/opencv/opencv_contrib/archive/${OPENCV_VERSION}.zip
+# RUN   unzip ${OPENCV_VERSION}.zip
+# RUN    rm ${OPENCV_VERSION}.zip
     # Create build folder and switch to it
-RUN    mkdir /opt/opencv-${OPENCV_VERSION}/build && cd /opt/opencv-${OPENCV_VERSION}/build
+# RUN    mkdir /workspace/opencv-${OPENCV_VERSION}
+RUN    mkdir /workspace/opencv-${OPENCV_VERSION}/build
+WORKDIR /workspace/opencv-${OPENCV_VERSION}/build
     # Cmake configure
 RUN    cmake \
-        -DOPENCV_EXTRA_MODULES_PATH=/opt/opencv_contrib-${OPENCV_VERSION}/modules \
+        -DOPENCV_EXTRA_MODULES_PATH=/workspace/opencv_contrib-${OPENCV_VERSION}/modules \
         -DWITH_CUDA=ON \
         -DCUDA_ARCH_BIN=7.5,8.0,8.6 \
         -DCMAKE_BUILD_TYPE=RELEASE \
@@ -122,7 +130,8 @@ RUN    make -j"$(nproc)"
 RUN    make install
 RUN    ldconfig
     # Remove OpenCV sources and build folder
-RUN    rm -rf /opt/opencv-${OPENCV_VERSION} && rm -rf /opt/opencv_contrib-${OPENCV_VERSION}
+RUN    rm -rf /workspace/opencv-${OPENCV_VERSION}
+RUN rm -rf /workspace/opencv_contrib-${OPENCV_VERSION}
 
 
 WORKDIR /

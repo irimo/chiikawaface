@@ -95,15 +95,18 @@ RUN apt-get update && apt-get upgrade -y &&\
         # python3-numpy \
     && rm -rf /var/lib/apt/lists/*
 
+RUN pip install opencv-python
+RUN pip install opencv-contrib-python
+
 # RUN pip3 install -U pip
 # RUN pip3 install -U setuptools
 
-WORKDIR /workspace/
-    # Download and unzip OpenCV and opencv_contrib and delte zip files
-RUN wget -c https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.tar.gz &&\
-    tar -zxvf ${OPENCV_VERSION}.tar.gz && rm ${OPENCV_VERSION}.tar.gz
-RUN wget -c https://github.com/opencv/opencv_contrib/archive/${OPENCV_VERSION}.tar.gz &&\
-    tar -zxvf ${OPENCV_VERSION}.tar.gz && rm ${OPENCV_VERSION}.tar.gz
+# WORKDIR /workspace/
+#     # Download and unzip OpenCV and opencv_contrib and delte zip files
+# RUN wget -c https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.tar.gz &&\
+#     tar -zxvf ${OPENCV_VERSION}.tar.gz && rm ${OPENCV_VERSION}.tar.gz
+# RUN wget -c https://github.com/opencv/opencv_contrib/archive/${OPENCV_VERSION}.tar.gz &&\
+#     tar -zxvf ${OPENCV_VERSION}.tar.gz && rm ${OPENCV_VERSION}.tar.gz
 
 # RUN    wget https://github.com/opencv/opencv/archive/${OPENCV_VERSION}.zip
 # RUN    unzip ${OPENCV_VERSION}.zip
@@ -113,25 +116,25 @@ RUN wget -c https://github.com/opencv/opencv_contrib/archive/${OPENCV_VERSION}.t
 # RUN    rm ${OPENCV_VERSION}.zip
     # Create build folder and switch to it
 # RUN    mkdir /workspace/opencv-${OPENCV_VERSION}
-RUN    mkdir /workspace/opencv-${OPENCV_VERSION}/build
-WORKDIR /workspace/opencv-${OPENCV_VERSION}/build
-    # Cmake configure
-RUN    cmake \
-        -DOPENCV_EXTRA_MODULES_PATH=/workspace/opencv_contrib-${OPENCV_VERSION}/modules \
-        -DWITH_CUDA=ON \
-        -DCUDA_ARCH_BIN=7.5,8.0,8.6 \
-        -DCMAKE_BUILD_TYPE=RELEASE \
-        # Install path will be /usr/local/lib (lib is implicit)
-        -DCMAKE_INSTALL_PREFIX=/usr/local \
-        .. 
-    # Make
-RUN    make -j"$(nproc)"
-    # Install to /usr/local/lib
-RUN    make install
-RUN    ldconfig
-    # Remove OpenCV sources and build folder
-RUN    rm -rf /workspace/opencv-${OPENCV_VERSION}
-RUN rm -rf /workspace/opencv_contrib-${OPENCV_VERSION}
+# RUN    mkdir /workspace/opencv-${OPENCV_VERSION}/build
+# WORKDIR /workspace/opencv-${OPENCV_VERSION}/build
+#     # Cmake configure
+# RUN    cmake \
+#         -DOPENCV_EXTRA_MODULES_PATH=/workspace/opencv_contrib-${OPENCV_VERSION}/modules \
+#         -DWITH_CUDA=ON \
+#         -DCUDA_ARCH_BIN=7.5,8.0,8.6 \
+#         -DCMAKE_BUILD_TYPE=RELEASE \
+#         # Install path will be /usr/local/lib (lib is implicit)
+#         -DCMAKE_INSTALL_PREFIX=/usr/local \
+#         .. 
+#     # Make
+# RUN    make -j"$(nproc)"
+#     # Install to /usr/local/lib
+# RUN    make install
+# RUN    ldconfig
+#     # Remove OpenCV sources and build folder
+# RUN    rm -rf /workspace/opencv-${OPENCV_VERSION}
+# RUN rm -rf /workspace/opencv_contrib-${OPENCV_VERSION}
 
 
 WORKDIR /

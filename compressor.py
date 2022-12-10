@@ -18,6 +18,7 @@ class compressor:
         img_origin = cv2.imread(law_path)
         # imgheight = img_origin.shape[0]
         # imgwidth = img_origin.shape[1]
+        print("parts_recognize() start")
         img_gray = cv2.cvtColor(img_origin, cv2.COLOR_BGR2GRAY)
         # input_img_path = "./images/lenna.png"
         output_img_path = "./out/lenna.png"

@@ -3,5 +3,5 @@
 
 # memo
 
-- docker build . -t font-convert
-- docker run --rm -it -v $(pwd)/:/var/www/html font-convert
+docker build . -t chiikawaface
+docker run -it -v $(pwd)/:/var/www/html --rm chiikawaface bash

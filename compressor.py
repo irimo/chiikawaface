@@ -8,7 +8,7 @@ import cv2
 # import random
 
 class compressor:
-    xml_face = "/usr/local/lib/python3.7/site-packages/cv2/data/haarcascade_frontalface_default.xml"
+    # xml_face = "/usr/local/lib/python3.7/site-packages/cv2/data/haarcascade_frontalface_default.xml"
     # xml_lefteye = "/usr/local/lib/python3.7/site-packages/cv2/data/haarcascade_lefteye_2splits.xml"
     def parts_recognize(self):
         print("parts_recognize() start")
@@ -32,13 +32,12 @@ class compressor:
         for x, y, w, h in targets:
             cv2.rectangle(img_gray, (x, y), (x + w, y + h), (255, 0, 0), 2)
 
-
-        # classifier = cv2.CascadeClassifier(xml_lefteye)
-        # targets = classifier.detectMultiScale(img_gray)
-        # for x, y, w, h in targets:
-        #     cv2.rectangle(img_gray, (x, y), (x + w, y + h), (255, 0, 0), 2)
-
         # # 右目
+        righteye = righteye_reco(img_gray)
+        targets = righteye.reco()
+        for x, y, w, h in targets:
+            cv2.rectangle(img_gray, (x, y), (x + w, y + h), (255, 0, 0), 2)
+
         # classifier = cv2.CascadeClassifier(XML_PATH_RIGHTEYE)
         # targets = classifier.detectMultiScale(img_gray)
         # for x, y, w, h in targets:
@@ -66,16 +65,16 @@ class face_reco(square_reco):
         super().__init__(img_gray, self.xml_face)
 
 class lefteye_reco(square_reco):
-    xml_lefteye = "haarcascade_lefteye_2splits.xml"
+    filename = "haarcascade_lefteye_2splits.xml"
     def __init__(self, img_gray):
         print("lefteye_reco init")
-        super().__init__(img_gray, self.xml_lefteye)
+        super().__init__(img_gray, self.filename)
 
 class righteye_reco(square_reco):
-    xml_lefteye = "haarcascade_lefteye_2splits.xml"
+    filename = "haarcascade_righteye_2splits.xml"
     def __init__(self, img_gray):
-        print("lefteye_reco init")
-        super().__init__(img_gray, self.xml_lefteye)
+        print("righteye_reco init")
+        super().__init__(img_gray, self.filename)
         
 compr = compressor()
 compr.parts_recognize()

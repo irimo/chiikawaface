@@ -10,7 +10,7 @@ import cv2
 class compressor:
     def parts_recognize(self):
         print("parts_recognize() start")
-        law_path = "./images/pkts/004.jpg"
+        law_path = "./images/pkts/003.jpg"
         # law_path = "./images/lenna.png"
         img_origin = cv2.imread(law_path)
         output_img_path = "./out/face_lefteye_righteye.png"

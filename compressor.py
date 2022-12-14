@@ -8,11 +8,8 @@ import cv2
 # import random
 
 class compressor:
-    # xml_face = "/usr/local/lib/python3.7/site-packages/cv2/data/haarcascade_frontalface_default.xml"
-    # xml_lefteye = "/usr/local/lib/python3.7/site-packages/cv2/data/haarcascade_lefteye_2splits.xml"
     def parts_recognize(self):
         print("parts_recognize() start")
-        # xml_righteye = "/usr/local/lib/python3.7/site-packages/cv2/data/haarcascade_righteye_2splits.xml"
 
         law_path = "./images/lenna.png"
         img_origin = cv2.imread(law_path)
@@ -22,29 +19,28 @@ class compressor:
         
         # 輪郭
         face = face_reco(img_gray)
-        targets = face.reco()
-        for x, y, w, h in targets:
-            cv2.rectangle(img_gray, (x, y), (x + w, y + h), (255, 0, 0), 2)
+        face_targets = face.reco()
 
         # 左目
         lefteye = lefteye_reco(img_gray)
-        targets = lefteye.reco()
-        for x, y, w, h in targets:
-            cv2.rectangle(img_gray, (x, y), (x + w, y + h), (255, 0, 0), 2)
+        lefteye_targets = lefteye.reco()
 
         # # 右目
         righteye = righteye_reco(img_gray)
-        targets = righteye.reco()
-        for x, y, w, h in targets:
+        righteye_targets = righteye.reco()
+
+        self.print_rect_at_image(img_gray, face_targets)
+        self.print_rect_at_image(img_gray, lefteye_targets)
+        self.print_rect_at_image(img_gray, righteye_targets)
+
+        self.img_write(output_img_path, img_gray)
+
+    def print_rect_at_image(self, img_gray, rect):
+        for x, y, w, h in rect:
             cv2.rectangle(img_gray, (x, y), (x + w, y + h), (255, 0, 0), 2)
 
-        # classifier = cv2.CascadeClassifier(XML_PATH_RIGHTEYE)
-        # targets = classifier.detectMultiScale(img_gray)
-        # for x, y, w, h in targets:
-        #     cv2.rectangle(img_gray, (x, y), (x + w, y + h), (255, 0, 0), 2)
-        
-        cv2.imwrite(output_img_path, img_gray)
-
+    def img_write(self, filename, img):
+        cv2.imwrite(filename, img)
 
 class square_reco:
     img_gray = ""

@@ -35,6 +35,7 @@ class compressor:
         img_origin = self.face_paste(img_origin)
         img_origin = self.lefteye_paste(img_origin)
         img_origin = self.righteye_paste(img_origin)
+        img_origin = self.mouth_paste(img_origin)
 
 
         self.img_write(output_img_path, img_origin)
@@ -56,6 +57,10 @@ class compressor:
 
     def righteye_paste(self, back_img):
         fore_img = cv2.imread("./images/parts/righteye.png",  cv2.IMREAD_UNCHANGED)
+        return self.paste(back_img, fore_img)
+
+    def mouth_paste(self, back_img):
+        fore_img = cv2.imread("./images/parts/mouth.png",  cv2.IMREAD_UNCHANGED)
         return self.paste(back_img, fore_img)
 
     def paste(self, back_img, fore_img):

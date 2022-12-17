@@ -1,11 +1,11 @@
 #coding: utf-8
 
 import cv2
-# import numpy as np
-# import math
-# import copy
-# import os
-# import random
+import numpy as np
+import math
+import copy
+import os
+import random
 
 class compressor:
     def parts_recognize(self):
@@ -13,8 +13,7 @@ class compressor:
         law_path = "./images/pkts/003.jpg"
         # law_path = "./images/lenna.png"
         img_origin = cv2.imread(law_path)
-        output_img_path = "./out/face_lefteye_righteye.png"
-        
+        output_img_path = "./out/ck.png"
         img_gray = cv2.cvtColor(img_origin, cv2.COLOR_BGR2GRAY)
         
         # 輪郭
@@ -33,7 +32,9 @@ class compressor:
         self.print_rect_at_image(img_gray, lefteye_targets)
         self.print_rect_at_image(img_gray, righteye_targets)
 
-        self.img_write(output_img_path, img_gray)
+        img_origin = self.face_paste(img_origin)
+
+        self.img_write(output_img_path, img_origin)
 
     def print_rect_at_image(self, img_gray, rect):
         for x, y, w, h in rect:
@@ -41,6 +42,22 @@ class compressor:
 
     def img_write(self, filename, img):
         cv2.imwrite(filename, img)
+
+    def face_paste(self, back_img):
+        fore_img = cv2.imread("./images/parts/face.png")
+        return back_img
+        pass
+        dx = 100    # 横方向の移動距離
+        dy = 100    # 縦方向の移動距離
+        h, w = fore_img.shape[:2]
+        face_after_size = (math.floor(h/5), math.floor(w/5))
+        fore_img = cv2.resize(fore_img, face_after_size)
+        back_img[dy:dy+h, dx:dx+w] = fore_img
+        return back_img
+        
+        # cv2.imshow('img',back_img)
+        # cv2.waitKey(0)
+        # cv2.destroyAllWindows()
 
 class square_reco:
     img_gray = ""

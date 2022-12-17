@@ -76,20 +76,10 @@ class compressor:
         return self.paste(back_img, fore_img, 100, 100)
 
     def paste(self, back_img, fore_img, dx, dy):
-        # return back_img
-        # pass
-        # dx = 100    # 横方向の移動距離
-        # dy = 100    # 縦方向の移動距離
         h, w = fore_img.shape[:2]
-        # face_after_size = (math.floor(h/5), math.floor(w/5))
-        # fore_img = cv2.resize(fore_img, face_after_size)
         back_img = self.alpha_blend(back_img, fore_img, (dx, dy))
-        # back_img[dy:dy+h, dx:dx+w] = fore_img
         return back_img
         
-        # cv2.imshow('img',back_img)
-        # cv2.waitKey(0)
-        # cv2.destroyAllWindows()
     def alpha_blend(self, frame: np.array, alpha_frame: np.array, position: (int, int)):
         """
         frame に alpha_frame をアルファブレンディングで描画する。

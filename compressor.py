@@ -44,21 +44,47 @@ class compressor:
         cv2.imwrite(filename, img)
 
     def face_paste(self, back_img):
-        fore_img = cv2.imread("./images/parts/face.png")
-        return back_img
-        pass
+        fore_img = cv2.imread("./images/parts/face.png",  cv2.IMREAD_UNCHANGED)
+        # return back_img
+        # pass
         dx = 100    # 横方向の移動距離
         dy = 100    # 縦方向の移動距離
         h, w = fore_img.shape[:2]
         face_after_size = (math.floor(h/5), math.floor(w/5))
         fore_img = cv2.resize(fore_img, face_after_size)
-        back_img[dy:dy+h, dx:dx+w] = fore_img
+        back_img = self.alpha_blend(back_img, fore_img, (dx, dy))
+        # back_img[dy:dy+h, dx:dx+w] = fore_img
         return back_img
         
         # cv2.imshow('img',back_img)
         # cv2.waitKey(0)
         # cv2.destroyAllWindows()
+    # https://qiita.com/smatsumt/items/923aefb052f217f2f3c5
+    def alpha_blend(self, frame: np.array, alpha_frame: np.array, position: (int, int)):
+        """
+        frame に alpha_frame をアルファブレンディングで描画する。
 
+        :param frame: ベースとなるフレーム。frame に直接、書き込まれるので、中身が変更される。
+        :param alpha_frame: 重ね合わる画像フレーム。アルファチャンネルつきで読み込まれている前提。
+        :param position: alpha_frame を描画する座標 (x, y)。負の値などはみ出る値も指定可能。
+        :return: 戻り値はなし。frame に直接、描画する。
+
+        usage:
+        base_frame = cv2.imread("bg.jpg")
+        png_image = cv2.imread("alpha.png", cv2.IMREAD_UNCHANGED)  # アルファチャンネル込みで読み込む
+        alpha_blend(base_frame, png_image, (1500, 300))
+        """
+        # 貼り付け先座標の設定 - alpha_frame がはみ出す場合への対処つき
+        x1, y1 = max(position[0], 0), max(position[1], 0)
+        x2 = min(position[0] + alpha_frame.shape[1], frame.shape[1])
+        y2 = min(position[1] + alpha_frame.shape[0], frame.shape[0])
+        ax1, ay1 = x1 - position[0], y1 - position[1]
+        ax2, ay2 = ax1 + x2 - x1, ay1 + y2 - y1
+
+        # 合成!
+        frame[y1:y2, x1:x2] = frame[y1:y2, x1:x2] * (1 - alpha_frame[ay1:ay2, ax1:ax2, 3:] / 255) + \
+                            alpha_frame[ay1:ay2, ax1:ax2, :3] * (alpha_frame[ay1:ay2, ax1:ax2, 3:] / 255)
+        return frame
 class square_reco:
     img_gray = ""
     xml_path = ""

@@ -33,6 +33,9 @@ class compressor:
         self.print_rect_at_image(img_gray, righteye_targets)
 
         img_origin = self.face_paste(img_origin)
+        img_origin = self.lefteye_paste(img_origin)
+        img_origin = self.righteye_paste(img_origin)
+
 
         self.img_write(output_img_path, img_origin)
 
@@ -42,9 +45,20 @@ class compressor:
 
     def img_write(self, filename, img):
         cv2.imwrite(filename, img)
-
+    
     def face_paste(self, back_img):
         fore_img = cv2.imread("./images/parts/face.png",  cv2.IMREAD_UNCHANGED)
+        return self.paste(back_img, fore_img)
+
+    def lefteye_paste(self, back_img):
+        fore_img = cv2.imread("./images/parts/lefteye.png",  cv2.IMREAD_UNCHANGED)
+        return self.paste(back_img, fore_img)
+
+    def righteye_paste(self, back_img):
+        fore_img = cv2.imread("./images/parts/righteye.png",  cv2.IMREAD_UNCHANGED)
+        return self.paste(back_img, fore_img)
+
+    def paste(self, back_img, fore_img):
         # return back_img
         # pass
         dx = 100    # 横方向の移動距離
@@ -59,7 +73,6 @@ class compressor:
         # cv2.imshow('img',back_img)
         # cv2.waitKey(0)
         # cv2.destroyAllWindows()
-    # https://qiita.com/smatsumt/items/923aefb052f217f2f3c5
     def alpha_blend(self, frame: np.array, alpha_frame: np.array, position: (int, int)):
         """
         frame に alpha_frame をアルファブレンディングで描画する。

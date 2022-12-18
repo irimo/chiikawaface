@@ -72,6 +72,7 @@ class compressor:
     def righteye_paste(self, back_img, rect, radian):
         px, py, pw, ph = rect[0]
         fore_img = cv2.imread("./images/parts/lefteye.png",  cv2.IMREAD_UNCHANGED)
+
         h, w = fore_img.shape[:2]
         face_after_size = (pw, ph)
         fore_img = cv2.resize(fore_img, face_after_size)

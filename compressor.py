@@ -10,6 +10,7 @@ import random
 class compressor:
     # 右目の縮尺決め打ち
     lefteye_ratio = 1.0 # 代入するので適当な値
+    face_ratio = 1.0
     def parts_recognize(self):
         print("parts_recognize() start")
         law_path = "./images/pkts/003.jpg"
@@ -37,7 +38,9 @@ class compressor:
         img_origin = self.face_paste(img_origin, face_targets, radian)
         img_origin = self.lefteye_paste(img_origin, lefteye_targets, radian)
         img_origin = self.righteye_paste(img_origin, righteye_targets, radian)
-        # img_origin = self.mouth_paste(img_origin)
+
+        mouth_targets = self.convert_mouth_rect(face_targets)
+        img_origin = self.mouth_paste(img_origin, mouth_targets, radian)
 
         # self.print_rect_at_image(img_origin, face_targets)
         # self.print_rect_at_image(img_origin, lefteye_targets)
@@ -62,6 +65,7 @@ class compressor:
 
         # fore_img = self.rotate(fore_img, radian, pw, ph)
         h, w = fore_img.shape[:2]
+        self.face_ratio = pw / w
         face_after_size = self.get_after_size_face(w, h, pw, ph)
         # face_after_size = (pw, ph)
         fore_img = cv2.resize(fore_img, face_after_size)
@@ -94,13 +98,23 @@ class compressor:
         center = self.get_center(rect)
         return self.putSprite_Affine(back_img, fore_img, (px,py), angle=radian, center=center)
         # return self.paste(back_img, fore_img, px, py)
-    # def mouth_paste(self, back_img, rect):
-    #     px, py, pw, ph = rect[0]
-    #     fore_img = cv2.imread("./images/parts/mouth.png",  cv2.IMREAD_UNCHANGED)
-    #     h, w = fore_img.shape[:2]
-    #     face_after_size = (pw, ph)
-    #     fore_img = cv2.resize(fore_img, face_after_size)
-    #     return self.paste(back_img, fore_img, px, py)
+    def mouth_paste(self, back_img, rect, radian):
+        px, py, pw, ph = rect[0]
+        fore_img = cv2.imread("./images/parts/mouth.png",  cv2.IMREAD_UNCHANGED)
+        h, w = fore_img.shape[:2]
+        if (self.lefteye_ratio == 1.0):    # 初期化の値でない（汚い...ごめんなさい）
+            self.lefteye_ratio = pw / w
+        face_after_size = (pw, ph)
+        fore_img = cv2.resize(fore_img, face_after_size)
+        center = self.get_center(rect)
+        return self.putSprite_Affine(back_img, fore_img, (px,py), angle=radian, center=center)
+    def convert_mouth_rect(self, face_rect):
+        fx, fy, fw, fh = face_rect[0]
+        my = math.floor(fy + (fh / 2))
+        mx = math.floor(fx + (fw / 3))
+        mw = math.floor(fw / 3)
+        mh = math.floor(fh / 3)
+        return [[mx, my, mw, mh]]
 
     # def paste(self, back_img, fore_img, dx, dy):
     #     h, w = fore_img.shape[:2]
@@ -112,8 +126,8 @@ class compressor:
         # ah = math.floor(ph / h)
         return (aw, ph)
     def get_after_size_eyes(self, w, h, pw, ph):
-        aw = math.floor(w * self.lefteye_ratio)
-        ah = math.floor(h * self.lefteye_ratio)
+        aw = math.floor(w * self.face_ratio)
+        ah = math.floor(h * self.face_ratio)
         return (aw, ah)
     # def get_reduction_ratio(self, rect, rect2):
     #     px, py, pw, ph = rect[0]
@@ -197,8 +211,8 @@ class compressor:
 
     def get_radian_position(self, rect):
         px, py, pw, ph = rect[0]
-
-        return ((px + math.floor(pw / 2)), (py + math.floor(ph / 2)))
+        return ((px + math.floor(pw / 2)), py)
+        # return ((px + math.floor(pw / 2)), (py + math.floor(ph / 2)))
 
     def get_degree_from_eyes(self, rect1, rect2):
         x1, y1 = self.get_radian_position(rect1)

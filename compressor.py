@@ -31,8 +31,8 @@ class compressor:
         radian = self.get_degree_from_eyes(lefteye_targets, righteye_targets)
 
         img_origin = self.face_paste(img_origin, face_targets, radian)
-        img_origin = self.lefteye_paste(img_origin, lefteye_targets)
-        img_origin = self.righteye_paste(img_origin, righteye_targets)
+        img_origin = self.lefteye_paste(img_origin, lefteye_targets, radian)
+        img_origin = self.righteye_paste(img_origin, righteye_targets, radian)
         # img_origin = self.mouth_paste(img_origin)
 
         self.print_rect_at_image(img_origin, face_targets)
@@ -52,27 +52,31 @@ class compressor:
     def face_paste(self, back_img, rect, radian):
         px, py, pw, ph = rect[0]
         fore_img = cv2.imread("./images/parts/face.png",  cv2.IMREAD_UNCHANGED)
-        fore_img = self.rotate(fore_img, radian, pw, ph)
+
+        # fore_img = self.rotate(fore_img, radian, pw, ph)
         h, w = fore_img.shape[:2]
         face_after_size = (pw, ph)
         fore_img = cv2.resize(fore_img, face_after_size)
-        return self.paste(back_img, fore_img, px, py)
+        return self.putSprite_Affine(back_img, fore_img, (px,py), radian)
+        # return self.paste(back_img, fore_img, px, py)
 
-    def lefteye_paste(self, back_img, rect):
-        px, py, pw, ph = rect[0]
-        fore_img = cv2.imread("./images/parts/lefteye.png",  cv2.IMREAD_UNCHANGED)
-        h, w = fore_img.shape[:2]
-        face_after_size = (pw, ph)
-        fore_img = cv2.resize(fore_img, face_after_size)
-        return self.paste(back_img, fore_img, px, py)
-
-    def righteye_paste(self, back_img, rect):
+    def lefteye_paste(self, back_img, rect, radian):
         px, py, pw, ph = rect[0]
         fore_img = cv2.imread("./images/parts/righteye.png",  cv2.IMREAD_UNCHANGED)
         h, w = fore_img.shape[:2]
         face_after_size = (pw, ph)
         fore_img = cv2.resize(fore_img, face_after_size)
-        return self.paste(back_img, fore_img, px, py)
+        return self.putSprite_Affine(back_img, fore_img, (px,py), radian)
+        # return self.paste(back_img, fore_img, px, py)
+
+    def righteye_paste(self, back_img, rect, radian):
+        px, py, pw, ph = rect[0]
+        fore_img = cv2.imread("./images/parts/lefteye.png",  cv2.IMREAD_UNCHANGED)
+        h, w = fore_img.shape[:2]
+        face_after_size = (pw, ph)
+        fore_img = cv2.resize(fore_img, face_after_size)
+        return self.putSprite_Affine(back_img, fore_img, (px,py), radian)
+        # return self.paste(back_img, fore_img, px, py)
 
     def mouth_paste(self, back_img, rect):
         px, py, pw, ph = rect[0]
@@ -112,6 +116,22 @@ class compressor:
         frame[y1:y2, x1:x2] = frame[y1:y2, x1:x2] * (1 - alpha_frame[ay1:ay2, ax1:ax2, 3:] / 255) + \
                             alpha_frame[ay1:ay2, ax1:ax2, :3] * (alpha_frame[ay1:ay2, ax1:ax2, 3:] / 255)
         return frame
+    # putSprite_Affine(back_img, fore_img, (x,y), radian)
+    def putSprite_Affine(self, back, front4, pos, angle=0, center=(0,0)):
+        x, y = pos
+        front3 = front4[:, :, :3]
+        mask1 =  front4[:, :, 3]
+        mask3 = 255- cv2.merge((mask1, mask1, mask1))
+        bh, bw = back.shape[:2]
+
+        M = cv2.getRotationMatrix2D(center, angle, 1)
+        M[0][2] += x
+        M[1][2] += y
+        front_rot = cv2.warpAffine(front3, M, (bw,bh))
+        mask_rot = cv2.warpAffine(mask3, M, (bw,bh), borderValue=(255,255,255))
+        tmp = cv2.bitwise_and(back, mask_rot)
+        result = cv2.bitwise_or(tmp, front_rot)
+        return result
 
     def rotate(self,img, deg, w, h):
         theta = np.deg2rad(deg)

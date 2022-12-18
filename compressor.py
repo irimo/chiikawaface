@@ -28,7 +28,9 @@ class compressor:
         righteye = righteye_reco(img_gray)
         righteye_targets = righteye.reco()
 
-        img_origin = self.face_paste(img_origin, face_targets)
+        radian = self.get_degree_from_eyes(lefteye_targets, righteye_targets)
+
+        img_origin = self.face_paste(img_origin, face_targets, radian)
         img_origin = self.lefteye_paste(img_origin, lefteye_targets)
         img_origin = self.righteye_paste(img_origin, righteye_targets)
         # img_origin = self.mouth_paste(img_origin)
@@ -47,9 +49,10 @@ class compressor:
     def img_write(self, filename, img):
         cv2.imwrite(filename, img)
     
-    def face_paste(self, back_img, rect):
+    def face_paste(self, back_img, rect, radian):
         px, py, pw, ph = rect[0]
         fore_img = cv2.imread("./images/parts/face.png",  cv2.IMREAD_UNCHANGED)
+        fore_img = self.rotate(fore_img, radian, pw, ph)
         h, w = fore_img.shape[:2]
         face_after_size = (pw, ph)
         fore_img = cv2.resize(fore_img, face_after_size)
@@ -110,29 +113,30 @@ class compressor:
                             alpha_frame[ay1:ay2, ax1:ax2, :3] * (alpha_frame[ay1:ay2, ax1:ax2, 3:] / 255)
         return frame
 
-    def rotate(self,img, deg):
+    def rotate(self,img, deg, w, h):
         theta = np.deg2rad(deg)
         mat = np.float32([[np.cos(theta), -np.sin(theta), 0], [np.sin(theta), np.cos(theta), 0]])
         img1 = cv2.warpAffine(img, mat, (w, h))
 
-        img = cv2.hconcat([img, img1])
-        del img1
+        # img2 = cv2.hconcat([img, img1])
+        # del img1
+        # del img
         # cv2_imshow(imgs)
-        return img
+        return img1
 
     def get_radian(self, x, y, x2, y2):
-        radian = Math.atan2(y2 - y, x2 - x)
+        radian = math.atan2(y2 - y, x2 - x)
         return radian
 
     def get_central(self, rect):
         px, py, pw, ph = rect[0]
 
-        return ((px + Math.floor(pw / 2)), (py + Math.floor(ph / 2)))
+        return ((px + math.floor(pw / 2)), (py + math.floor(ph / 2)))
 
-    def get_degree_from_eyes(rect1, rect2):
+    def get_degree_from_eyes(self, rect1, rect2):
         x1, y1 = self.get_central(rect1)
         x2, y2 = self.get_central(rect2)
-        radian = get_radian(x1, y1, x2, y2)
+        radian = self.get_radian(x1, y1, x2, y2)
         return radian
 class square_reco:
     img_gray = ""

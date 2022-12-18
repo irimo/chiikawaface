@@ -28,14 +28,14 @@ class compressor:
         righteye = righteye_reco(img_gray)
         righteye_targets = righteye.reco()
 
-        self.print_rect_at_image(img_gray, face_targets)
-        self.print_rect_at_image(img_gray, lefteye_targets)
-        self.print_rect_at_image(img_gray, righteye_targets)
+        img_origin = self.face_paste(img_origin, face_targets)
+        img_origin = self.lefteye_paste(img_origin, lefteye_targets)
+        img_origin = self.righteye_paste(img_origin, righteye_targets)
+        # img_origin = self.mouth_paste(img_origin)
 
-        img_origin = self.face_paste(img_origin)
-        img_origin = self.lefteye_paste(img_origin)
-        img_origin = self.righteye_paste(img_origin)
-        img_origin = self.mouth_paste(img_origin)
+        self.print_rect_at_image(img_origin, face_targets)
+        self.print_rect_at_image(img_origin, lefteye_targets)
+        self.print_rect_at_image(img_origin, righteye_targets)
 
 
         self.img_write(output_img_path, img_origin)
@@ -47,33 +47,37 @@ class compressor:
     def img_write(self, filename, img):
         cv2.imwrite(filename, img)
     
-    def face_paste(self, back_img):
+    def face_paste(self, back_img, rect):
+        px, py, pw, ph = rect[0]
         fore_img = cv2.imread("./images/parts/face.png",  cv2.IMREAD_UNCHANGED)
         h, w = fore_img.shape[:2]
-        face_after_size = (math.floor(h/5), math.floor(w/5))
+        face_after_size = (pw, ph)
         fore_img = cv2.resize(fore_img, face_after_size)
-        return self.paste(back_img, fore_img, 100, 100)
+        return self.paste(back_img, fore_img, px, py)
 
-    def lefteye_paste(self, back_img):
+    def lefteye_paste(self, back_img, rect):
+        px, py, pw, ph = rect[0]
         fore_img = cv2.imread("./images/parts/lefteye.png",  cv2.IMREAD_UNCHANGED)
         h, w = fore_img.shape[:2]
-        face_after_size = (math.floor(h/5), math.floor(w/5))
+        face_after_size = (pw, ph)
         fore_img = cv2.resize(fore_img, face_after_size)
-        return self.paste(back_img, fore_img, 100, 100)
+        return self.paste(back_img, fore_img, px, py)
 
-    def righteye_paste(self, back_img):
+    def righteye_paste(self, back_img, rect):
+        px, py, pw, ph = rect[0]
         fore_img = cv2.imread("./images/parts/righteye.png",  cv2.IMREAD_UNCHANGED)
         h, w = fore_img.shape[:2]
-        face_after_size = (math.floor(h/5), math.floor(w/5))
+        face_after_size = (pw, ph)
         fore_img = cv2.resize(fore_img, face_after_size)
-        return self.paste(back_img, fore_img, 100, 100)
+        return self.paste(back_img, fore_img, px, py)
 
-    def mouth_paste(self, back_img):
+    def mouth_paste(self, back_img, rect):
+        px, py, pw, ph = rect[0]
         fore_img = cv2.imread("./images/parts/mouth.png",  cv2.IMREAD_UNCHANGED)
         h, w = fore_img.shape[:2]
-        face_after_size = (math.floor(h/5), math.floor(w/5))
+        face_after_size = (pw, ph)
         fore_img = cv2.resize(fore_img, face_after_size)
-        return self.paste(back_img, fore_img, 100, 100)
+        return self.paste(back_img, fore_img, px, py)
 
     def paste(self, back_img, fore_img, dx, dy):
         h, w = fore_img.shape[:2]
@@ -119,6 +123,9 @@ class compressor:
     def get_radian(x, y, x2, y2):
         radian = Math.atan2(y2 - y, x2 - x)
         return radian
+
+    def get_central(self, rect):
+        return (x2 - x1, y2 - y1)
 class square_reco:
     img_gray = ""
     xml_path = ""

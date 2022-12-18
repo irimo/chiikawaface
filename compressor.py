@@ -55,8 +55,8 @@ class compressor:
 
         # fore_img = self.rotate(fore_img, radian, pw, ph)
         h, w = fore_img.shape[:2]
-        # face_after_size = self.get_after_size(w, h, pw, ph)
-        face_after_size = (pw, ph)
+        face_after_size = self.get_after_size(w, h, pw, ph)
+        # face_after_size = (pw, ph)
         fore_img = cv2.resize(fore_img, face_after_size)
         return self.putSprite_Affine(back_img, fore_img, (px,py), radian)
         # return self.putSprite_Affine(back_img, fore_img, (px,py), radian, self.get_center(rect))
@@ -96,9 +96,8 @@ class compressor:
     # 顔が全ての人間と比べて横長なので
     def get_after_size(self, w, h, pw, ph):
         aw = math.floor(w * (ph / h))
-        ah = math.floor(ph / h)
-        return (aw, ah)
-
+        # ah = math.floor(ph / h)
+        return (aw, ph)
     def get_center(self, rect):
         px, py, pw, ph = rect[0]
         return (px + math.floor(pw / 2), py + math.floor(ph / 2))

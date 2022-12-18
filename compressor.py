@@ -43,9 +43,9 @@ class compressor:
         mouth_targets = self.convert_mouth_rect(face_targets)
         img_origin = self.mouth_paste(img_origin, mouth_targets, angle)
 
-        # self.print_rect_at_image(img_origin, face_targets)
-        # self.print_rect_at_image(img_origin, lefteye_targets)
-        # self.print_rect_at_image(img_origin, righteye_targets)
+        self.print_rect_at_image(img_origin, face_targets)
+        self.print_rect_at_image(img_origin, lefteye_targets)
+        self.print_rect_at_image(img_origin, righteye_targets)
 
 
         self.img_write(output_img_path, img_origin)
@@ -141,7 +141,9 @@ class compressor:
     # duplicated
     def get_center(self, rect):
         px, py, pw, ph = rect[0]
-        return [(px + pw / 2), (py + ph / 2)]
+        # return [(pw/2), (ph/2)]
+        return [float(px), float(py)]
+        # return [(px + pw / 2), (py + ph / 2)]
     def get_pos(self, center, aw, ah):
         # px, py, pw, ph = rect[0]
         # center = self.get_center(rect)

@@ -34,13 +34,14 @@ class compressor:
         # bigger_rect = self.get_reduction_ratio(lefteye_targets, righteye_targets)
 
         radian = self.get_degree_from_eyes(lefteye_targets, righteye_targets)
+        angle = math.degrees(radian)
 
-        img_origin = self.face_paste(img_origin, face_targets, radian)
-        img_origin = self.lefteye_paste(img_origin, lefteye_targets, radian)
-        img_origin = self.righteye_paste(img_origin, righteye_targets, radian)
+        img_origin = self.face_paste(img_origin, face_targets, angle)
+        img_origin = self.lefteye_paste(img_origin, lefteye_targets, angle)
+        img_origin = self.righteye_paste(img_origin, righteye_targets, angle)
 
         mouth_targets = self.convert_mouth_rect(face_targets)
-        img_origin = self.mouth_paste(img_origin, mouth_targets, radian)
+        img_origin = self.mouth_paste(img_origin, mouth_targets, angle)
 
         # self.print_rect_at_image(img_origin, face_targets)
         # self.print_rect_at_image(img_origin, lefteye_targets)
@@ -178,7 +179,6 @@ class compressor:
     # putSprite_Affine(back_img, fore_img, (x,y), radian)
     def putSprite_Affine(self, back, front4, pos, angle=0, center=[0,0]):
         # x, y = pos
-        angle = math.degrees(angle)
         print(angle)
         front3 = front4[:, :, :3]
         mask1 =  front4[:, :, 3]

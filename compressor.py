@@ -37,7 +37,7 @@ class compressor:
 
         img_origin = self.face_paste(img_origin, face_targets, radian)
         img_origin = self.lefteye_paste(img_origin, lefteye_targets, radian)
-        img_origin = self.righteye_paste(img_origin, righteye_targets, radian)
+        img_origin = self.righteye_paste(img_origin, righteye_targets, 0.8)
 
         mouth_targets = self.convert_mouth_rect(face_targets)
         img_origin = self.mouth_paste(img_origin, mouth_targets, radian)

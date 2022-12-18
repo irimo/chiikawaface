@@ -120,12 +120,20 @@ class compressor:
         # cv2_imshow(imgs)
         return img
 
-    def get_radian(x, y, x2, y2):
+    def get_radian(self, x, y, x2, y2):
         radian = Math.atan2(y2 - y, x2 - x)
         return radian
 
     def get_central(self, rect):
-        return (x2 - x1, y2 - y1)
+        px, py, pw, ph = rect[0]
+
+        return ((px + Math.floor(pw / 2)), (py + Math.floor(ph / 2)))
+
+    def get_degree_from_eyes(rect1, rect2):
+        x1, y1 = self.get_central(rect1)
+        x2, y2 = self.get_central(rect2)
+        radian = get_radian(x1, y1, x2, y2)
+        return radian
 class square_reco:
     img_gray = ""
     xml_path = ""

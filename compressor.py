@@ -105,6 +105,16 @@ class compressor:
         frame[y1:y2, x1:x2] = frame[y1:y2, x1:x2] * (1 - alpha_frame[ay1:ay2, ax1:ax2, 3:] / 255) + \
                             alpha_frame[ay1:ay2, ax1:ax2, :3] * (alpha_frame[ay1:ay2, ax1:ax2, 3:] / 255)
         return frame
+
+    def rotate(self,img, deg):
+        theta = np.deg2rad(deg)
+        mat = np.float32([[np.cos(theta), -np.sin(theta), 0], [np.sin(theta), np.cos(theta), 0]])
+        img1 = cv2.warpAffine(img, mat, (w, h))
+
+        img = cv2.hconcat([img, img1])
+        del img1
+        # cv2_imshow(imgs)
+        return img
 class square_reco:
     img_gray = ""
     xml_path = ""

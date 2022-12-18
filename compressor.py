@@ -115,6 +115,10 @@ class compressor:
         del img1
         # cv2_imshow(imgs)
         return img
+
+    def get_radian(x, y, x2, y2):
+        radian = Math.atan2(y2 - y, x2 - x)
+        return radian
 class square_reco:
     img_gray = ""
     xml_path = ""

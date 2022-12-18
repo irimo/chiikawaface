@@ -57,7 +57,7 @@ class compressor:
     def img_write(self, filename, img):
         cv2.imwrite(filename, img)
     
-    def face_paste(self, back_img, rect, radian):
+    def face_paste(self, back_img, rect, angle):
         px, py, pw, ph = rect[0]
         a = 1.2
         pw = math.floor(pw * a)
@@ -72,10 +72,10 @@ class compressor:
         fore_img = cv2.resize(fore_img, face_after_size)
         # return self.putSprite_Affine(back_img, fore_img, (px,py), radian)
         center = self.get_center(rect)
-        return self.putSprite_Affine(back_img, fore_img, (px,py), angle=radian, center=center)
+        return self.putSprite_Affine(back_img, fore_img, (px,py), angle=angle, center=center)
         # return self.paste(back_img, fore_img, px, py)
 
-    def lefteye_paste(self, back_img, rect, radian):
+    def lefteye_paste(self, back_img, rect, angle):
         px, py, pw, ph = rect[0]
         # 左側の目、という名称になっている
         fore_img = cv2.imread("./images/parts/righteye.png",  cv2.IMREAD_UNCHANGED)
@@ -84,10 +84,10 @@ class compressor:
         face_after_size = self.get_after_size_eyes(w, h, pw, ph)
         fore_img = cv2.resize(fore_img, face_after_size)
         center = self.get_center(rect)
-        return self.putSprite_Affine(back_img, fore_img, (px,py), angle=radian, center=center)
+        return self.putSprite_Affine(back_img, fore_img, (px,py), angle=angle, center=center)
         # return self.paste(back_img, fore_img, px, py)
 
-    def righteye_paste(self, back_img, rect, radian):
+    def righteye_paste(self, back_img, rect, angle):
         px, py, pw, ph = rect[0]
         # 右側の目、という名称になっている
         fore_img = cv2.imread("./images/parts/lefteye.png",  cv2.IMREAD_UNCHANGED)
@@ -97,9 +97,9 @@ class compressor:
         face_after_size = self.get_after_size_eyes(w, h, pw, ph)
         fore_img = cv2.resize(fore_img, face_after_size)
         center = self.get_center(rect)
-        return self.putSprite_Affine(back_img, fore_img, (px,py), angle=radian, center=center)
+        return self.putSprite_Affine(back_img, fore_img, (px,py), angle=angle, center=center)
         # return self.paste(back_img, fore_img, px, py)
-    def mouth_paste(self, back_img, rect, radian):
+    def mouth_paste(self, back_img, rect, angle):
         px, py, pw, ph = rect[0]
         fore_img = cv2.imread("./images/parts/mouth.png",  cv2.IMREAD_UNCHANGED)
         h, w = fore_img.shape[:2]
@@ -108,7 +108,7 @@ class compressor:
         face_after_size = (pw, ph)
         fore_img = cv2.resize(fore_img, face_after_size)
         center = self.get_center(rect)
-        return self.putSprite_Affine(back_img, fore_img, (px,py), angle=radian, center=center)
+        return self.putSprite_Affine(back_img, fore_img, (px,py), angle=angle, center=center)
     def convert_mouth_rect(self, face_rect):
         fx, fy, fw, fh = face_rect[0]
         my = math.floor(fy + (fh / 2))

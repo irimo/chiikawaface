@@ -58,8 +58,9 @@ class compressor:
         face_after_size = self.get_after_size(w, h, pw, ph)
         # face_after_size = (pw, ph)
         fore_img = cv2.resize(fore_img, face_after_size)
-        return self.putSprite_Affine(back_img, fore_img, (px,py), radian)
-        # return self.putSprite_Affine(back_img, fore_img, (px,py), radian, self.get_center(rect))
+        # return self.putSprite_Affine(back_img, fore_img, (px,py), radian)
+        center = self.get_center(rect)
+        return self.putSprite_Affine(back_img, fore_img, (px,py), angle=radian, center=center)
         # return self.paste(back_img, fore_img, px, py)
 
     def lefteye_paste(self, back_img, rect, radian):
@@ -81,62 +82,62 @@ class compressor:
         return self.putSprite_Affine(back_img, fore_img, (px,py), radian)
         # return self.paste(back_img, fore_img, px, py)
 
-    def mouth_paste(self, back_img, rect):
-        px, py, pw, ph = rect[0]
-        fore_img = cv2.imread("./images/parts/mouth.png",  cv2.IMREAD_UNCHANGED)
-        h, w = fore_img.shape[:2]
-        face_after_size = (pw, ph)
-        fore_img = cv2.resize(fore_img, face_after_size)
-        return self.paste(back_img, fore_img, px, py)
+    # def mouth_paste(self, back_img, rect):
+    #     px, py, pw, ph = rect[0]
+    #     fore_img = cv2.imread("./images/parts/mouth.png",  cv2.IMREAD_UNCHANGED)
+    #     h, w = fore_img.shape[:2]
+    #     face_after_size = (pw, ph)
+    #     fore_img = cv2.resize(fore_img, face_after_size)
+    #     return self.paste(back_img, fore_img, px, py)
 
-    def paste(self, back_img, fore_img, dx, dy):
-        h, w = fore_img.shape[:2]
-        back_img = self.alpha_blend(back_img, fore_img, (dx, dy))
-        return back_img
+    # def paste(self, back_img, fore_img, dx, dy):
+    #     h, w = fore_img.shape[:2]
+    #     back_img = self.alpha_blend(back_img, fore_img, (dx, dy))
+    #     return back_img
     # 顔が全ての人間と比べて横長なので
     def get_after_size(self, w, h, pw, ph):
         aw = math.floor(w * (ph / h))
         # ah = math.floor(ph / h)
         return (aw, ph)
+    # duplicated
     def get_center(self, rect):
         px, py, pw, ph = rect[0]
-        return (px + math.floor(pw / 2), py + math.floor(ph / 2))
+        return [(px + pw / 2), (py + ph / 2)]
 
 
         
-    def alpha_blend(self, frame: np.array, alpha_frame: np.array, position: (int, int)):
-        """
-        frame に alpha_frame をアルファブレンディングで描画する。
+    # def alpha_blend(self, frame: np.array, alpha_frame: np.array, position: (int, int)):
+    #     """
+    #     frame に alpha_frame をアルファブレンディングで描画する。
 
-        :param frame: ベースとなるフレーム。frame に直接、書き込まれるので、中身が変更される。
-        :param alpha_frame: 重ね合わる画像フレーム。アルファチャンネルつきで読み込まれている前提。
-        :param position: alpha_frame を描画する座標 (x, y)。負の値などはみ出る値も指定可能。
-        :return: 戻り値はなし。frame に直接、描画する。
+    #     :param frame: ベースとなるフレーム。frame に直接、書き込まれるので、中身が変更される。
+    #     :param alpha_frame: 重ね合わる画像フレーム。アルファチャンネルつきで読み込まれている前提。
+    #     :param position: alpha_frame を描画する座標 (x, y)。負の値などはみ出る値も指定可能。
+    #     :return: 戻り値はなし。frame に直接、描画する。
 
-        usage:
-        base_frame = cv2.imread("bg.jpg")
-        png_image = cv2.imread("alpha.png", cv2.IMREAD_UNCHANGED)  # アルファチャンネル込みで読み込む
-        alpha_blend(base_frame, png_image, (1500, 300))
-        """
-        # 貼り付け先座標の設定 - alpha_frame がはみ出す場合への対処つき
-        x1, y1 = max(position[0], 0), max(position[1], 0)
-        x2 = min(position[0] + alpha_frame.shape[1], frame.shape[1])
-        y2 = min(position[1] + alpha_frame.shape[0], frame.shape[0])
-        ax1, ay1 = x1 - position[0], y1 - position[1]
-        ax2, ay2 = ax1 + x2 - x1, ay1 + y2 - y1
+    #     usage:
+    #     base_frame = cv2.imread("bg.jpg")
+    #     png_image = cv2.imread("alpha.png", cv2.IMREAD_UNCHANGED)  # アルファチャンネル込みで読み込む
+    #     alpha_blend(base_frame, png_image, (1500, 300))
+    #     """
+    #     # 貼り付け先座標の設定 - alpha_frame がはみ出す場合への対処つき
+    #     x1, y1 = max(position[0], 0), max(position[1], 0)
+    #     x2 = min(position[0] + alpha_frame.shape[1], frame.shape[1])
+    #     y2 = min(position[1] + alpha_frame.shape[0], frame.shape[0])
+    #     ax1, ay1 = x1 - position[0], y1 - position[1]
+    #     ax2, ay2 = ax1 + x2 - x1, ay1 + y2 - y1
 
-        # 合成!
-        frame[y1:y2, x1:x2] = frame[y1:y2, x1:x2] * (1 - alpha_frame[ay1:ay2, ax1:ax2, 3:] / 255) + \
-                            alpha_frame[ay1:ay2, ax1:ax2, :3] * (alpha_frame[ay1:ay2, ax1:ax2, 3:] / 255)
-        return frame
+    #     # 合成!
+    #     frame[y1:y2, x1:x2] = frame[y1:y2, x1:x2] * (1 - alpha_frame[ay1:ay2, ax1:ax2, 3:] / 255) + \
+    #                         alpha_frame[ay1:ay2, ax1:ax2, :3] * (alpha_frame[ay1:ay2, ax1:ax2, 3:] / 255)
+    #     return frame
     # putSprite_Affine(back_img, fore_img, (x,y), radian)
-    def putSprite_Affine(self, back, front4, pos, angle=0, center=(0,0)):
+    def putSprite_Affine(self, back, front4, pos, angle=0, center=[0,0]):
         x, y = pos
         front3 = front4[:, :, :3]
         mask1 =  front4[:, :, 3]
         mask3 = 255- cv2.merge((mask1, mask1, mask1))
         bh, bw = back.shape[:2]
-
         M = cv2.getRotationMatrix2D(center, angle, 1)
         M[0][2] += x
         M[1][2] += y

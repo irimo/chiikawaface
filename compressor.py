@@ -30,7 +30,7 @@ class compressor:
         righteye = righteye_reco(img_gray)
         righteye_targets = righteye.reco()
 
-        bigger_rect = self.get_reduction_ratio(lefteye_targets, righteye_targets)
+        # bigger_rect = self.get_reduction_ratio(lefteye_targets, righteye_targets)
 
         radian = self.get_degree_from_eyes(lefteye_targets, righteye_targets)
 
@@ -55,11 +55,14 @@ class compressor:
     
     def face_paste(self, back_img, rect, radian):
         px, py, pw, ph = rect[0]
+        a = 1.2
+        pw = math.floor(pw * a)
+        ph = math.floor(ph * a)
         fore_img = cv2.imread("./images/parts/face.png",  cv2.IMREAD_UNCHANGED)
 
         # fore_img = self.rotate(fore_img, radian, pw, ph)
         h, w = fore_img.shape[:2]
-        face_after_size = self.get_after_size(w, h, pw, ph)
+        face_after_size = self.get_after_size_face(w, h, pw, ph)
         # face_after_size = (pw, ph)
         fore_img = cv2.resize(fore_img, face_after_size)
         # return self.putSprite_Affine(back_img, fore_img, (px,py), radian)
@@ -72,8 +75,8 @@ class compressor:
         # 左側の目、という名称になっている
         fore_img = cv2.imread("./images/parts/righteye.png",  cv2.IMREAD_UNCHANGED)
         h, w = fore_img.shape[:2]
-        self.lefteye_ratio = w / pw
-        face_after_size = self.get_after_size(w, h, pw, ph)
+        self.lefteye_ratio = pw / w
+        face_after_size = self.get_after_size_eyes(w, h, pw, ph)
         fore_img = cv2.resize(fore_img, face_after_size)
         center = self.get_center(rect)
         return self.putSprite_Affine(back_img, fore_img, (px,py), angle=radian, center=center)
@@ -84,9 +87,9 @@ class compressor:
         # 右側の目、という名称になっている
         fore_img = cv2.imread("./images/parts/lefteye.png",  cv2.IMREAD_UNCHANGED)
         h, w = fore_img.shape[:2]
-        if (self.lefteye_ratio < 1.0):    # 初期化の値でない（汚い...ごめんなさい）
-            self.lefteye_ratio = w / pw
-        face_after_size = self.get_after_size(w, h, pw, ph)
+        if (self.lefteye_ratio == 1.0):    # 初期化の値でない（汚い...ごめんなさい）
+            self.lefteye_ratio = pw / w
+        face_after_size = self.get_after_size_eyes(w, h, pw, ph)
         fore_img = cv2.resize(fore_img, face_after_size)
         center = self.get_center(rect)
         return self.putSprite_Affine(back_img, fore_img, (px,py), angle=radian, center=center)
@@ -104,7 +107,7 @@ class compressor:
     #     back_img = self.alpha_blend(back_img, fore_img, (dx, dy))
     #     return back_img
     # 顔が全ての人間と比べて横長なので
-    def get_after_size(self, w, h, pw, ph):
+    def get_after_size_face(self, w, h, pw, ph):
         aw = math.floor(w * (ph / h))
         # ah = math.floor(ph / h)
         return (aw, ph)
@@ -112,15 +115,15 @@ class compressor:
         aw = math.floor(w * self.lefteye_ratio)
         ah = math.floor(h * self.lefteye_ratio)
         return (aw, ah)
+    # def get_reduction_ratio(self, rect, rect2):
+    #     px, py, pw, ph = rect[0]
+    #     px2, py2, pw2, ph2 = rect2[0]
+
+    #     if (ph < ph2):
+    #         return rect2
+    #     return rect
+
     # duplicated
-    def get_reduction_ratio(self, rect, rect2):
-        px, py, pw, ph = rect[0]
-        px2, py2, pw2, ph2 = rect2[0]
-
-        if (ph < ph2):
-            return rect2
-        return rect
-
     def get_center(self, rect):
         px, py, pw, ph = rect[0]
         return [(px + pw / 2), (py + ph / 2)]
@@ -192,14 +195,14 @@ class compressor:
         radian = math.atan2(y2 - y, x2 - x)
         return radian
 
-    def get_central(self, rect):
+    def get_radian_position(self, rect):
         px, py, pw, ph = rect[0]
 
         return ((px + math.floor(pw / 2)), (py + math.floor(ph / 2)))
 
     def get_degree_from_eyes(self, rect1, rect2):
-        x1, y1 = self.get_central(rect1)
-        x2, y2 = self.get_central(rect2)
+        x1, y1 = self.get_radian_position(rect1)
+        x2, y2 = self.get_radian_position(rect2)
         radian = self.get_radian(x1, y1, x2, y2)
         return radian
 class square_reco:

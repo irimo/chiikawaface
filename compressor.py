@@ -34,7 +34,7 @@ class compressor:
         # bigger_rect = self.get_reduction_ratio(lefteye_targets, righteye_targets)
 
         radian = self.get_degree_from_eyes(lefteye_targets, righteye_targets)
-        angle = math.degrees(radian)
+        angle = math.degrees(-radian) # 計算汚い
 
         img_origin = self.face_paste(img_origin, face_targets, angle)
         img_origin = self.lefteye_paste(img_origin, lefteye_targets, angle)

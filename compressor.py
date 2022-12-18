@@ -28,6 +28,8 @@ class compressor:
         righteye = righteye_reco(img_gray)
         righteye_targets = righteye.reco()
 
+        bigger_rect = self.get_reduction_ratio(lefteye_targets, righteye_targets)
+
         radian = self.get_degree_from_eyes(lefteye_targets, righteye_targets)
 
         img_origin = self.face_paste(img_origin, face_targets, radian)
@@ -35,9 +37,9 @@ class compressor:
         img_origin = self.righteye_paste(img_origin, righteye_targets, radian)
         # img_origin = self.mouth_paste(img_origin)
 
-        self.print_rect_at_image(img_origin, face_targets)
-        self.print_rect_at_image(img_origin, lefteye_targets)
-        self.print_rect_at_image(img_origin, righteye_targets)
+        # self.print_rect_at_image(img_origin, face_targets)
+        # self.print_rect_at_image(img_origin, lefteye_targets)
+        # self.print_rect_at_image(img_origin, righteye_targets)
 
 
         self.img_write(output_img_path, img_origin)
@@ -67,7 +69,7 @@ class compressor:
         px, py, pw, ph = rect[0]
         fore_img = cv2.imread("./images/parts/righteye.png",  cv2.IMREAD_UNCHANGED)
         h, w = fore_img.shape[:2]
-        face_after_size = (pw, ph)
+        face_after_size = self.get_after_size(w, h, pw, ph)
         fore_img = cv2.resize(fore_img, face_after_size)
         center = self.get_center(rect)
         return self.putSprite_Affine(back_img, fore_img, (px,py), angle=radian, center=center)
@@ -78,12 +80,11 @@ class compressor:
         fore_img = cv2.imread("./images/parts/lefteye.png",  cv2.IMREAD_UNCHANGED)
 
         h, w = fore_img.shape[:2]
-        face_after_size = (pw, ph)
+        face_after_size = self.get_after_size(w, h, pw, ph)
         fore_img = cv2.resize(fore_img, face_after_size)
         center = self.get_center(rect)
         return self.putSprite_Affine(back_img, fore_img, (px,py), angle=radian, center=center)
         # return self.paste(back_img, fore_img, px, py)
-
     # def mouth_paste(self, back_img, rect):
     #     px, py, pw, ph = rect[0]
     #     fore_img = cv2.imread("./images/parts/mouth.png",  cv2.IMREAD_UNCHANGED)
@@ -102,6 +103,14 @@ class compressor:
         # ah = math.floor(ph / h)
         return (aw, ph)
     # duplicated
+    def get_reduction_ratio(self, rect, rect2):
+        px, py, pw, ph = rect[0]
+        px2, py2, pw2, ph2 = rect2[0]
+
+        if (ph < ph2):
+            return rect2
+        return rect
+
     def get_center(self, rect):
         px, py, pw, ph = rect[0]
         return [(px + pw / 2), (py + ph / 2)]
@@ -142,6 +151,7 @@ class compressor:
     # putSprite_Affine(back_img, fore_img, (x,y), radian)
     def putSprite_Affine(self, back, front4, pos, angle=0, center=[0,0]):
         # x, y = pos
+        print(angle)
         front3 = front4[:, :, :3]
         mask1 =  front4[:, :, 3]
         mask3 = 255- cv2.merge((mask1, mask1, mask1))

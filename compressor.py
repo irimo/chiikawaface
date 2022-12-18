@@ -69,7 +69,8 @@ class compressor:
         h, w = fore_img.shape[:2]
         face_after_size = (pw, ph)
         fore_img = cv2.resize(fore_img, face_after_size)
-        return self.putSprite_Affine(back_img, fore_img, (px,py), radian)
+        center = self.get_center(rect)
+        return self.putSprite_Affine(back_img, fore_img, (px,py), angle=radian, center=center)
         # return self.paste(back_img, fore_img, px, py)
 
     def righteye_paste(self, back_img, rect, radian):
@@ -79,7 +80,8 @@ class compressor:
         h, w = fore_img.shape[:2]
         face_after_size = (pw, ph)
         fore_img = cv2.resize(fore_img, face_after_size)
-        return self.putSprite_Affine(back_img, fore_img, (px,py), radian)
+        center = self.get_center(rect)
+        return self.putSprite_Affine(back_img, fore_img, (px,py), angle=radian, center=center)
         # return self.paste(back_img, fore_img, px, py)
 
     # def mouth_paste(self, back_img, rect):
@@ -103,8 +105,14 @@ class compressor:
     def get_center(self, rect):
         px, py, pw, ph = rect[0]
         return [(px + pw / 2), (py + ph / 2)]
-
-
+    def get_pos(self, center, aw, ah):
+        # px, py, pw, ph = rect[0]
+        # center = self.get_center(rect)
+        # print(center)
+        center_x, center_y = center
+        x = center_x - aw / 2
+        y = center_y - ah / 2
+        return (math.floor(x), math.floor(y))
         
     # def alpha_blend(self, frame: np.array, alpha_frame: np.array, position: (int, int)):
     #     """
@@ -133,11 +141,13 @@ class compressor:
     #     return frame
     # putSprite_Affine(back_img, fore_img, (x,y), radian)
     def putSprite_Affine(self, back, front4, pos, angle=0, center=[0,0]):
-        x, y = pos
+        # x, y = pos
         front3 = front4[:, :, :3]
         mask1 =  front4[:, :, 3]
         mask3 = 255- cv2.merge((mask1, mask1, mask1))
         bh, bw = back.shape[:2]
+        ph, pw = front4.shape[:2]
+        x, y = self.get_pos(center,pw,ph)
         M = cv2.getRotationMatrix2D(center, angle, 1)
         M[0][2] += x
         M[1][2] += y

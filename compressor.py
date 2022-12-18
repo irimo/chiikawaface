@@ -142,7 +142,7 @@ class compressor:
     def get_center(self, rect):
         px, py, pw, ph = rect[0]
         # return [(pw/2), (ph/2)]
-        return [float(px), float(py)]
+        return [float(px), float(py + ph)]
         # return [(px + pw / 2), (py + ph / 2)]
     def get_pos(self, center, aw, ah):
         # px, py, pw, ph = rect[0]

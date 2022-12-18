@@ -8,6 +8,8 @@ import os
 import random
 
 class compressor:
+    # 右目の縮尺決め打ち
+    lefteye_ratio = 1.0 # 代入するので適当な値
     def parts_recognize(self):
         print("parts_recognize() start")
         law_path = "./images/pkts/003.jpg"
@@ -67,9 +69,11 @@ class compressor:
 
     def lefteye_paste(self, back_img, rect, radian):
         px, py, pw, ph = rect[0]
+        # 左側の目、という名称になっている
         fore_img = cv2.imread("./images/parts/righteye.png",  cv2.IMREAD_UNCHANGED)
         h, w = fore_img.shape[:2]
         face_after_size = self.get_after_size(w, h, pw, ph)
+        self.lefteye_ratio = w / pw
         fore_img = cv2.resize(fore_img, face_after_size)
         center = self.get_center(rect)
         return self.putSprite_Affine(back_img, fore_img, (px,py), angle=radian, center=center)
@@ -77,10 +81,12 @@ class compressor:
 
     def righteye_paste(self, back_img, rect, radian):
         px, py, pw, ph = rect[0]
+        # 右側の目、という名称になっている
         fore_img = cv2.imread("./images/parts/lefteye.png",  cv2.IMREAD_UNCHANGED)
-
         h, w = fore_img.shape[:2]
         face_after_size = self.get_after_size(w, h, pw, ph)
+        if (self.lefteye_ratio < 1.0):    # 初期化の値でない（汚い...ごめんなさい）
+            self.lefteye_ratio = w / pw
         fore_img = cv2.resize(fore_img, face_after_size)
         center = self.get_center(rect)
         return self.putSprite_Affine(back_img, fore_img, (px,py), angle=radian, center=center)
@@ -102,6 +108,7 @@ class compressor:
         aw = math.floor(w * (ph / h))
         # ah = math.floor(ph / h)
         return (aw, ph)
+    
     # duplicated
     def get_reduction_ratio(self, rect, rect2):
         px, py, pw, ph = rect[0]

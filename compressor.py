@@ -23,36 +23,44 @@ class compressor:
         face = face_reco(img_gray)
         face_targets = face.reco()
 
-        # 左目
-        lefteye = lefteye_reco(img_gray)
-        lefteye_targets = lefteye.reco()
+        # 目
+        eyes = eyes_reco(img_gray)
+        eyes_targets = eyes.reco()
 
-        # # 右目
-        righteye = righteye_reco(img_gray)
-        righteye_targets = righteye.reco()
+        # # 左目
+        # lefteye = lefteye_reco(img_gray)
+        # leftsideeye_targets = lefteye.reco()
 
-        # bigger_rect = self.get_reduction_ratio(lefteye_targets, righteye_targets)
+        # # # 右目
+        # righteye = righteye_reco(img_gray)
+        # rightsideeye_targets = righteye.reco()
 
-        radian = self.get_degree_from_eyes(lefteye_targets, righteye_targets)
+        # bigger_rect = self.get_reduction_ratio(leftsideeye_targets, rightsideeye_targets)
+        print(eyes_targets)
+        radian = self.get_degree_from_eyes(eyes_targets[0], eyes_targets[1])
         angle = math.degrees(-radian) # 計算汚い
 
+        # 右はどっちか、左はどっちか
+        leftsideeye_targets = eyes_targets[0]
+        rightsideeye_targets = eyes_targets[1]
+
         img_origin = self.face_paste(img_origin, face_targets, angle)
-        img_origin = self.lefteye_paste(img_origin, lefteye_targets, angle)
-        img_origin = self.righteye_paste(img_origin, righteye_targets, angle)
+        img_origin = self.leftsideeye_targets(img_origin, leftsideeye_targets, angle)
+        img_origin = self.rightsideeye_targets(img_origin, rightsideeye_targets, angle)
 
         mouth_targets = self.convert_mouth_rect(face_targets)
         img_origin = self.mouth_paste(img_origin, mouth_targets, angle)
 
-        self.print_rect_at_image(img_origin, face_targets)
-        self.print_rect_at_image(img_origin, lefteye_targets)
-        self.print_rect_at_image(img_origin, righteye_targets)
+        self.print_rect_at_image(img_origin, face_targets[0])
+        self.print_rect_at_image(img_origin, leftsideeye_targets)
+        self.print_rect_at_image(img_origin, rightsideeye_targets)
 
 
         self.img_write(output_img_path, img_origin)
 
     def print_rect_at_image(self, img_gray, rect):
-        for x, y, w, h in rect:
-            cv2.rectangle(img_gray, (x, y), (x + w, y + h), (255, 0, 0), 2)
+        x, y, w, h = rect
+        cv2.rectangle(img_gray, (x, y), (x + w, y + h), (255, 0, 0), 2)
 
     def img_write(self, filename, img):
         cv2.imwrite(filename, img)
@@ -71,24 +79,27 @@ class compressor:
         # face_after_size = (pw, ph)
         fore_img = cv2.resize(fore_img, face_after_size)
         # return self.putSprite_Affine(back_img, fore_img, (px,py), radian)
-        center = self.get_center(rect)
+        center = self.get_rotete_point(rect[0])
+        print("faee_paste center")
+        print(center)
+
         return self.putSprite_Affine(back_img, fore_img, (px,py), angle=angle, center=center)
         # return self.paste(back_img, fore_img, px, py)
 
-    def lefteye_paste(self, back_img, rect, angle):
-        px, py, pw, ph = rect[0]
-        # 左側の目、という名称になっている
+    def leftsideeye_targets(self, back_img, rect, angle):
+        px, py, pw, ph = rect
         fore_img = cv2.imread("./images/parts/righteye.png",  cv2.IMREAD_UNCHANGED)
         h, w = fore_img.shape[:2]
         self.lefteye_ratio = pw / w
         face_after_size = self.get_after_size_eyes(w, h, pw, ph)
         fore_img = cv2.resize(fore_img, face_after_size)
-        center = self.get_center(rect)
+        center = self.get_rotete_point(rect)
+        print(rect)
         return self.putSprite_Affine(back_img, fore_img, (px,py), angle=angle, center=center)
         # return self.paste(back_img, fore_img, px, py)
 
-    def righteye_paste(self, back_img, rect, angle):
-        px, py, pw, ph = rect[0]
+    def rightsideeye_targets(self, back_img, rect, angle):
+        px, py, pw, ph = rect
         # 右側の目、という名称になっている
         fore_img = cv2.imread("./images/parts/lefteye.png",  cv2.IMREAD_UNCHANGED)
         h, w = fore_img.shape[:2]
@@ -96,7 +107,10 @@ class compressor:
             self.lefteye_ratio = pw / w
         face_after_size = self.get_after_size_eyes(w, h, pw, ph)
         fore_img = cv2.resize(fore_img, face_after_size)
-        center = self.get_center(rect)
+        center = self.get_rotete_point(rect)
+        print("rightsideeye_targets center")
+        print(center)
+        print(rect)
         return self.putSprite_Affine(back_img, fore_img, (px,py), angle=angle, center=center)
         # return self.paste(back_img, fore_img, px, py)
     def mouth_paste(self, back_img, rect, angle):
@@ -107,7 +121,7 @@ class compressor:
             self.lefteye_ratio = pw / w
         face_after_size = (pw, ph)
         fore_img = cv2.resize(fore_img, face_after_size)
-        center = self.get_center(rect)
+        center = self.get_rotete_point(rect[0])
         return self.putSprite_Affine(back_img, fore_img, (px,py), angle=angle, center=center)
     def convert_mouth_rect(self, face_rect):
         fx, fy, fw, fh = face_rect[0]
@@ -139,14 +153,14 @@ class compressor:
     #     return rect
 
     # duplicated
-    def get_center(self, rect):
-        px, py, pw, ph = rect[0]
+    def get_rotete_point(self, rect):
+        px, py, pw, ph = rect
         # return [(pw/2), (ph/2)]
         return [float(px), float(py + ph)]
         # return [(px + pw / 2), (py + ph / 2)]
     def get_pos(self, center, aw, ah):
         # px, py, pw, ph = rect[0]
-        # center = self.get_center(rect)
+        # center = self.get_rotete_point(rect)
         # print(center)
         center_x, center_y = center
         x = center_x - aw / 2
@@ -213,7 +227,7 @@ class compressor:
         return radian
 
     def get_radian_position(self, rect):
-        px, py, pw, ph = rect[0]
+        px, py, pw, ph = rect
         return ((px + math.floor(pw / 2)), py)
         # return ((px + math.floor(pw / 2)), (py + math.floor(ph / 2)))
 
@@ -251,6 +265,12 @@ class righteye_reco(square_reco):
     def __init__(self, img_gray):
         print("righteye_reco init")
         super().__init__(img_gray, self.filename)
+class eyes_reco(square_reco):
+    filename = "haarcascade_eye.xml"
+    def __init__(self, img_gray):
+        print("eyes_reco init")
+        super().__init__(img_gray, self.filename)
+
         
 compr = compressor()
 compr.parts_recognize()

@@ -85,7 +85,7 @@ class compressor:
         # print("faee_paste center")
         # print(center)
 
-        return self.putSprite_Affine(back_img, fore_img, (px,py), angle=angle, center=center)
+        return self.putSprite_Affine(back_img, fore_img, (px,py), rect, angle=angle, center=center)
         # return self.paste(back_img, fore_img, px, py)
 
     def leftsideeye_targets(self, back_img, rect, angle):
@@ -97,7 +97,7 @@ class compressor:
         fore_img = cv2.resize(fore_img, face_after_size)
         center = self.get_rotete_point(rect)
         # print(rect)
-        return self.putSprite_Affine(back_img, fore_img, (px,py), angle=angle, center=center)
+        return self.putSprite_Affine(back_img, fore_img, (px,py),rect,  angle=angle, center=center)
         # return self.paste(back_img, fore_img, px, py)
 
     def rightsideeye_targets(self, back_img, rect, angle):
@@ -113,7 +113,7 @@ class compressor:
         print("rightsideeye_targets center")
         print(center)
         print(rect)
-        return self.putSprite_Affine(back_img, fore_img, (px,py), angle=angle, center=center)
+        return self.putSprite_Affine(back_img, fore_img, (px,py), rect, angle=angle, center=center)
         # return self.paste(back_img, fore_img, px, py)
     def mouth_paste(self, back_img, rect, angle):
         px, py, pw, ph = rect[0]
@@ -124,7 +124,7 @@ class compressor:
         face_after_size = (pw, ph)
         fore_img = cv2.resize(fore_img, face_after_size)
         center = self.get_rotete_point(rect[0])
-        return self.putSprite_Affine(back_img, fore_img, (px,py), angle=angle, center=center)
+        return self.putSprite_Affine(back_img, fore_img, (px,py), rect, angle=angle, center=center)
     def convert_mouth_rect(self, face_rect):
         fx, fy, fw, fh = face_rect[0]
         my = math.floor(fy + (fh / 2))
@@ -157,53 +157,29 @@ class compressor:
     # duplicated
     def get_rotete_point(self, rect):
         px, py, pw, ph = rect
-        # return [(pw/2), (ph/2)]
-        return [float(px + pw), float(py)]
+        return [(pw/2), (ph/2)]
+        # return [float(px + pw), float(py + ph)]
         # return [(px + pw / 2), (py + ph / 2)]
-    def get_pos(self, center, aw, ah):
+        # return [(px + pw / 2), float(py + ph / 2)]
+    def get_pos(self, center, x, y, shape, rect):
+        h, w = shape
         # px, py, pw, ph = rect[0]
         # center = self.get_rotete_point(rect)
         # print(center)
         center_x, center_y = center
-        x = center_x - aw / 2
-        y = center_y - ah / 2
+        x = center_x + (w / 2)
+        y = center_y - h / 2
         return (math.floor(x), math.floor(y))
         
-    # def alpha_blend(self, frame: np.array, alpha_frame: np.array, position: (int, int)):
-    #     """
-    #     frame に alpha_frame をアルファブレンディングで描画する。
-
-    #     :param frame: ベースとなるフレーム。frame に直接、書き込まれるので、中身が変更される。
-    #     :param alpha_frame: 重ね合わる画像フレーム。アルファチャンネルつきで読み込まれている前提。
-    #     :param position: alpha_frame を描画する座標 (x, y)。負の値などはみ出る値も指定可能。
-    #     :return: 戻り値はなし。frame に直接、描画する。
-
-    #     usage:
-    #     base_frame = cv2.imread("bg.jpg")
-    #     png_image = cv2.imread("alpha.png", cv2.IMREAD_UNCHANGED)  # アルファチャンネル込みで読み込む
-    #     alpha_blend(base_frame, png_image, (1500, 300))
-    #     """
-    #     # 貼り付け先座標の設定 - alpha_frame がはみ出す場合への対処つき
-    #     x1, y1 = max(position[0], 0), max(position[1], 0)
-    #     x2 = min(position[0] + alpha_frame.shape[1], frame.shape[1])
-    #     y2 = min(position[1] + alpha_frame.shape[0], frame.shape[0])
-    #     ax1, ay1 = x1 - position[0], y1 - position[1]
-    #     ax2, ay2 = ax1 + x2 - x1, ay1 + y2 - y1
-
-    #     # 合成!
-    #     frame[y1:y2, x1:x2] = frame[y1:y2, x1:x2] * (1 - alpha_frame[ay1:ay2, ax1:ax2, 3:] / 255) + \
-    #                         alpha_frame[ay1:ay2, ax1:ax2, :3] * (alpha_frame[ay1:ay2, ax1:ax2, 3:] / 255)
-    #     return frame
-    # putSprite_Affine(back_img, fore_img, (x,y), radian)
-    def putSprite_Affine(self, back, front4, pos, angle=0, center=[0,0]):
-        # x, y = pos
+    def putSprite_Affine(self, back, front4, pos, rect_target, angle=0, center=[0,0]):
+        x, y = pos
         print(angle)
         front3 = front4[:, :, :3]
         mask1 =  front4[:, :, 3]
         mask3 = 255- cv2.merge((mask1, mask1, mask1))
         bh, bw = back.shape[:2]
         ph, pw = front4.shape[:2]
-        x, y = self.get_pos(center,pw,ph)
+        x, y = self.get_pos(center,x,y,front4.shape[:2], rect_target)
         M = cv2.getRotationMatrix2D(center, angle, 1)
         M[0][2] += x
         M[1][2] += y

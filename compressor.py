@@ -44,16 +44,16 @@ class compressor:
         leftsideeye_targets = eyes_targets[0]
         rightsideeye_targets = eyes_targets[1]
 
-        img_origin = self.face_paste(img_origin, face_targets, angle)
+        img_origin = self.face_paste(img_origin, face_targets[0], angle)
         img_origin = self.leftsideeye_targets(img_origin, leftsideeye_targets, angle)
         img_origin = self.rightsideeye_targets(img_origin, rightsideeye_targets, angle)
 
         mouth_targets = self.convert_mouth_rect(face_targets)
         img_origin = self.mouth_paste(img_origin, mouth_targets, angle)
 
-        self.print_rect_at_image(img_origin, face_targets[0])
-        self.print_rect_at_image(img_origin, leftsideeye_targets)
-        self.print_rect_at_image(img_origin, rightsideeye_targets)
+        # self.print_rect_at_image(img_origin, face_targets[0])
+        # self.print_rect_at_image(img_origin, leftsideeye_targets)
+        # self.print_rect_at_image(img_origin, rightsideeye_targets)
         # self.print_rect_at_image(img_origin, eyes_targets[3])
         # self.print_rect_at_image(img_origin, eyes_targets[2])
 
@@ -68,7 +68,7 @@ class compressor:
         cv2.imwrite(filename, img)
     
     def face_paste(self, back_img, rect, angle):
-        px, py, pw, ph = rect[0]
+        px, py, pw, ph = rect
         a = 1.2
         pw = math.floor(pw * a)
         ph = math.floor(ph * a)
@@ -81,8 +81,8 @@ class compressor:
         # face_after_size = (pw, ph)
         fore_img = cv2.resize(fore_img, face_after_size)
         # return self.putSprite_Affine(back_img, fore_img, (px,py), radian)
-        center = self.get_rotete_point(rect[0])
-        # print("faee_paste center")
+        center = self.get_rotete_point(fore_img.shape[:2])
+
         # print(center)
 
         return self.putSprite_Affine(back_img, fore_img, (px,py), rect, angle=angle, center=center)
@@ -95,7 +95,7 @@ class compressor:
         self.lefteye_ratio = pw / w
         face_after_size = self.get_after_size_eyes(w, h, pw, ph)
         fore_img = cv2.resize(fore_img, face_after_size)
-        center = self.get_rotete_point(rect)
+        center = self.get_rotete_point(fore_img.shape[:2])
         # print(rect)
         return self.putSprite_Affine(back_img, fore_img, (px,py),rect,  angle=angle, center=center)
         # return self.paste(back_img, fore_img, px, py)
@@ -109,21 +109,21 @@ class compressor:
             self.lefteye_ratio = pw / w
         face_after_size = self.get_after_size_eyes(w, h, pw, ph)
         fore_img = cv2.resize(fore_img, face_after_size)
-        center = self.get_rotete_point(rect)
+        center = self.get_rotete_point(fore_img.shape[:2])
         print("rightsideeye_targets center")
         print(center)
         print(rect)
         return self.putSprite_Affine(back_img, fore_img, (px,py), rect, angle=angle, center=center)
         # return self.paste(back_img, fore_img, px, py)
     def mouth_paste(self, back_img, rect, angle):
-        px, py, pw, ph = rect[0]
+        px, py, pw, ph = rect
         fore_img = cv2.imread("./images/parts/mouth.png",  cv2.IMREAD_UNCHANGED)
         h, w = fore_img.shape[:2]
         if (self.lefteye_ratio == 1.0):    # 初期化の値でない（汚い...ごめんなさい）
             self.lefteye_ratio = pw / w
         face_after_size = (pw, ph)
         fore_img = cv2.resize(fore_img, face_after_size)
-        center = self.get_rotete_point(rect[0])
+        center = self.get_rotete_point(fore_img.shape[:2])
         return self.putSprite_Affine(back_img, fore_img, (px,py), rect, angle=angle, center=center)
     def convert_mouth_rect(self, face_rect):
         fx, fy, fw, fh = face_rect[0]
@@ -131,7 +131,7 @@ class compressor:
         mx = math.floor(fx + (fw / 3))
         mw = math.floor(fw / 3)
         mh = math.floor(fh / 3)
-        return [[mx, my, mw, mh]]
+        return [mx, my, mw, mh]
 
     # def paste(self, back_img, fore_img, dx, dy):
     #     h, w = fore_img.shape[:2]
@@ -155,20 +155,34 @@ class compressor:
     #     return rect
 
     # duplicated
-    def get_rotete_point(self, rect):
-        px, py, pw, ph = rect
-        return [(pw/2), (ph/2)]
+    def get_rotete_point(self, shape):
+        cfh, cfw = shape
+        center = (cfw/2, cfh/2)
+        return center
         # return [float(px + pw), float(py + ph)]
         # return [(px + pw / 2), (py + ph / 2)]
         # return [(px + pw / 2), float(py + ph / 2)]
     def get_pos(self, center, x, y, shape, rect):
         h, w = shape
-        # px, py, pw, ph = rect[0]
+        px, py, pw, ph = rect
         # center = self.get_rotete_point(rect)
         # print(center)
         center_x, center_y = center
-        x = center_x + (w / 2)
-        y = center_y - h / 2
+        rect_center_x = px + pw / 2
+        x = rect_center_x - center_x
+        rect_center_y = py + ph / 2
+        y = rect_center_y - center_y
+        print("center_x, center_y")
+        print(center_x)
+        print(center_y)
+        print("rect_center_x/y")
+        print(rect_center_x)
+        print(rect_center_y)
+        print("x,y")
+        print(x)
+        print(y)
+        # x = center_x
+        # y = center_y - h / 2
         return (math.floor(x), math.floor(y))
         
     def putSprite_Affine(self, back, front4, pos, rect_target, angle=0, center=[0,0]):

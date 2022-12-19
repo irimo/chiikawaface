@@ -19,3 +19,6 @@ haarcascade_frontalface_alt2.xml         haarcascade_smile.xml
 haarcascade_frontalface_alt_tree.xml     haarcascade_upperbody.xml
 haarcascade_frontalface_default.xml
 '''
+
+- マツコ・デラックス
+ - https://naturaleight.co.jp/matsuko/

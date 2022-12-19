@@ -13,7 +13,7 @@ class compressor:
     face_ratio = 1.0
     def parts_recognize(self):
         print("parts_recognize() start")
-        law_path = "./images/pkts/003.jpg"
+        law_path = "./images/idol/001.jpg"
         # law_path = "./images/lenna.png"
         img_origin = cv2.imread(law_path)
         output_img_path = "./out/ck.png"
@@ -54,6 +54,8 @@ class compressor:
         self.print_rect_at_image(img_origin, face_targets[0])
         self.print_rect_at_image(img_origin, leftsideeye_targets)
         self.print_rect_at_image(img_origin, rightsideeye_targets)
+        # self.print_rect_at_image(img_origin, eyes_targets[3])
+        # self.print_rect_at_image(img_origin, eyes_targets[2])
 
 
         self.img_write(output_img_path, img_origin)
@@ -80,8 +82,8 @@ class compressor:
         fore_img = cv2.resize(fore_img, face_after_size)
         # return self.putSprite_Affine(back_img, fore_img, (px,py), radian)
         center = self.get_rotete_point(rect[0])
-        print("faee_paste center")
-        print(center)
+        # print("faee_paste center")
+        # print(center)
 
         return self.putSprite_Affine(back_img, fore_img, (px,py), angle=angle, center=center)
         # return self.paste(back_img, fore_img, px, py)
@@ -94,7 +96,7 @@ class compressor:
         face_after_size = self.get_after_size_eyes(w, h, pw, ph)
         fore_img = cv2.resize(fore_img, face_after_size)
         center = self.get_rotete_point(rect)
-        print(rect)
+        # print(rect)
         return self.putSprite_Affine(back_img, fore_img, (px,py), angle=angle, center=center)
         # return self.paste(back_img, fore_img, px, py)
 
@@ -156,7 +158,7 @@ class compressor:
     def get_rotete_point(self, rect):
         px, py, pw, ph = rect
         # return [(pw/2), (ph/2)]
-        return [float(px), float(py + ph)]
+        return [float(px + pw), float(py)]
         # return [(px + pw / 2), (py + ph / 2)]
     def get_pos(self, center, aw, ah):
         # px, py, pw, ph = rect[0]

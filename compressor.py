@@ -48,7 +48,7 @@ class compressor:
         img_origin = self.leftsideeye_targets(img_origin, leftsideeye_targets, angle)
         img_origin = self.rightsideeye_targets(img_origin, rightsideeye_targets, angle)
 
-        mouth_targets = self.convert_mouth_rect(face_targets)
+        mouth_targets = self.convert_mouth_rect(face_targets, leftsideeye_targets, rightsideeye_targets)
         img_origin = self.mouth_paste(img_origin, mouth_targets, angle)
 
         # self.print_rect_at_image(img_origin, face_targets[0])
@@ -125,10 +125,13 @@ class compressor:
         fore_img = cv2.resize(fore_img, face_after_size)
         center = self.get_rotete_point(fore_img.shape[:2])
         return self.putSprite_Affine(back_img, fore_img, (px,py), rect, angle=angle, center=center)
-    def convert_mouth_rect(self, face_rect):
+    def convert_mouth_rect(self, face_rect, lefteye_rect, righteye_rect):
         fx, fy, fw, fh = face_rect[0]
+        lx, ly, lw, lh = lefteye_rect
+        rx, ry, rw, rh = righteye_rect
+        mc = math.floor((rx + rw + lx) / 2)
         my = math.floor(fy + (fh / 2))
-        mx = math.floor(fx + (fw / 3))
+        mx = math.floor(fx + (mc / 3))
         mw = math.floor(fw / 3)
         mh = math.floor(fh / 3)
         return [mx, my, mw, mh]
